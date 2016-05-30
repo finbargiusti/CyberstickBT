@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Sync with other device</h1>
+<br>
+<form action="" method="post">
+  <input type="text" placeholder="Title" name="title" value="{{request.form.title}}"><br/><br/>
+  <textarea rows="20" cols="60" placeholder="Post" name="post" value="{{request.form.post}}"></textarea>
+  <input class="btn btn-default" type="submit" value="Sync">
+</form>
+
+{% endblock %}
