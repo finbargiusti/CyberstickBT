@@ -1,13 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 {% for filens in fileList %}
-<a class="downloadz" href="/static/uploads/{{ session }}/{{ filens }}" download="{{ filens }}">
+<a class="downloadz" href="/downloadfile/{{ session }}/{{ filens }}" download="{{ filens }}">
 	<div style="downloadz">
 		<div style="background-color:none;
 {% if filens.rsplit('.', 1)[1] in PIC_EXTENSIONS %}background-image: url('/static/images/512px/{{ filens.rsplit('.', 1)[1] }}.png{% else %}background-image: url('/static/images/512px/_blank.png{% endif %}') ;background-size:75px;background-repeat:no-repeat;background-position: center;text-align:center;line-height:100px;width:100px;height:100px;border-radius:20px;">
 		</div>
 		<center>
+		{% if filens|length > 10 %}
 			<h4 alt="{{ filens }}">{{ filens[:7] }}...</h4>
+		{% elif filens|length < 11 %}
+			<h4 alt="{{ filens }}">{{ filens }}</h4>
+		{% endif %}
 		</center>
 	</div>
 </a>
