@@ -103,11 +103,12 @@ def downloadApi(did):
     for session in sessions:
         name, stime = session.split('-')
         if name == did:
+            sessionTime = stime
             sessionFolder = session
-    fileLoc = os.listdir("/home/finbar/www/static/uploads/" + sessionFolder)
+    sessionFilesList = os.listdir("static/uploads/" + sessionFolder + "/")
     files = []
-    for x in range(len(fileLoc)):
-        fileSplit = fileLoc[x].rsplit(".", 1)
+    for x in range(len(sessionFileList)):
+        fileSplit = sessionFileList[x].rsplit(".", 1)
         name = fileSplit[0]
         extension = fileSplit[1]
         files.append({'name': name, 'extension': extension})
@@ -171,8 +172,6 @@ def download(did):
             sessionTime = stime
             sessionFolder = session
     sessionFilesList = os.listdir("static/uploads/" + sessionFolder + "/")
-    print sessionFilesList
-    #FIXME Get rid of hard coded html
     seconds = round(900 - (time.time() - float(sessionTime)), 0)
     m, s = divmod(seconds, 60)
     timeRemain = "%02d minutes %02d seconds" % (m, s)
