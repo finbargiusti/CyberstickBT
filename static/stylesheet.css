@@ -1,5 +1,9 @@
 .navbar {
-	background-color:#b6bac8;
+	background-color:#2ecc71;
+	border-radius: 0;
+	right: 0px;
+	left: 0px;
+	top:0px;
 }
 a.downloadz {
 	display:inline-block;width:120px;color:#333333;text-decoration:none;

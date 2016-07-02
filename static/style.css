@@ -1,32 +1,8 @@
-#bar {
-	position: relative;
-	height:10vh;
-	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#bfd255+0,8eb92a+50,9ecb2d+100 */
-	background: rgb(191,210,85); /* Old browsers */
-	background: -moz-linear-gradient(top,  rgba(191,210,85,1) 0%, rgba(142,185,42,1) 50%, rgba(158,203,45,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(191,210,85,1)), color-stop(50%,rgba(142,185,42,1)), color-stop(100%,rgba(158,203,45,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  rgba(191,210,85,1) 0%,rgba(142,185,42,1) 50%,rgba(158,203,45,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  rgba(191,210,85,1) 0%,rgba(142,185,42,1) 50%,rgba(158,203,45,1) 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  rgba(191,210,85,1) 0%,rgba(142,185,42,1) 50%,rgba(158,203,45,1) 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  rgba(191,210,85,1) 0%,rgba(142,185,42,1) 50%,rgba(158,203,45,1) 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bfd255', endColorstr='#9ecb2d',GradientType=0 ); /* IE6-9 */
-
-	width:100%;
-	left: 0px;
-	top:0px;
-	right:0px;
-}
-#sweg:hover{
-	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#e0c58f+0,c69219+50,e0db8f+100 */
-background: rgb(224,197,143); /* Old browsers */
-background: -moz-linear-gradient(top,  rgb(224,197,143) 0%, rgb(198,146,25) 50%, rgb(224,219,143) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(224,197,143)), color-stop(50%,rgb(198,146,25)), color-stop(100%,rgb(224,219,143))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgb(224,197,143) 0%,rgb(198,146,25) 50%,rgb(224,219,143) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgb(224,197,143) 0%,rgb(198,146,25) 50%,rgb(224,219,143) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgb(224,197,143) 0%,rgb(198,146,25) 50%,rgb(224,219,143) 100%); /* IE10+ */
-background: linear-gradient(to bottom,  rgb(224,197,143) 0%,rgb(198,146,25) 50%,rgb(224,219,143) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0c58f', endColorstr='#e0db8f',GradientType=0 ); /* IE6-9 */
-
+body {
+	background-color: #ecf0f1;
+	margin: 0;
+	padding: 0;
+	border: none;
 }
 #sweg	 {
 	font-size: 2vw;
