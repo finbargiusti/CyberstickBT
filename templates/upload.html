@@ -9,7 +9,7 @@ Dropzone.options.dropzone = {
 <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
 <center>   
 	<h1>Upload new File</h1>
-	<form action="/uploadz/{{ displayPath }}" method="post"  id="dropzone" class="dropzone">
+	<form action="/uploadz/{{ displayPath }}" method="post"  id="dropzone" class="dropzone" style="background-color:#ecf0f1">
 		<div class="fallback">
 			<input name="file" type="file" multiple />
 		</div>
@@ -17,7 +17,8 @@ Dropzone.options.dropzone = {
 </center>
 <br/>
 <center>
-	<a class="btn btn-primary btn-lg" href="/download/{{ linker }}">Download link</a>
+	<a class="btn btn-primary btn-lg" href="/download/{{ linker }}">Download link</a><br/><br/>
+	<div class="well" ><h4><b>ID:</b></h4><p>{{ linker }}</p></div>
 </center>
 <br/>
 <a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out my CyberStick http://www.cyberstick.click/download/{{ displayPath }}.">Tweet</a>

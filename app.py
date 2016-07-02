@@ -107,8 +107,8 @@ def downloadApi(did):
             sessionFolder = session
     sessionFilesList = os.listdir("static/uploads/" + sessionFolder + "/")
     files = []
-    for x in range(len(sessionFileList)):
-        fileSplit = sessionFileList[x].rsplit(".", 1)
+    for file in sessionFilesList:
+        fileSplit = file.rsplit(".", 1)
         name = fileSplit[0]
         extension = fileSplit[1]
         files.append({'name': name, 'extension': extension})
@@ -254,4 +254,4 @@ def csdget():
     return render_template('csdget.html')
 
 
-app.run(host='0.0.0.0', port=80)
+app.run(host='0.0.0.0', port=80, debug=True)
