@@ -1,4 +1,4 @@
-# CyberStick
+# Cyberstick
 ## Anonymous
 Cyberstick does not require an account and does not track personal information.
 ## Easy
