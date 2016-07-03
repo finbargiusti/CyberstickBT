@@ -110,7 +110,10 @@ def downloadApi(did):
     for file in sessionFilesList:
         fileSplit = file.rsplit(".", 1)
         name = fileSplit[0]
-        extension = fileSplit[1]
+	if len(fileSplit) >= 1:
+		extension = fileSplit[1]
+	else:
+		extension = "None!"
         files.append({'name': name, 'extension': extension})
     filesession = {'session': sessionFolder}
     return jsonify(zfile=files, xfile=filesession)
@@ -254,4 +257,4 @@ def csdget():
     return render_template('csdget.html')
 
 
-app.run(host='0.0.0.0', port=80, debug=True)
+app.run(host='0.0.0.0', port=80)
