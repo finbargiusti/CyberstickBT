@@ -93,7 +93,7 @@ def add_message():
             filename = secure_filename(file.filename)
             file_path = "/home/finbar/www/static/uploads/" + seis + "/"
             file.save(os.path.join(file_path, filename))
-            return (seis)
+            return (name)
 
 
 @app.route('/api/download/<did>')
