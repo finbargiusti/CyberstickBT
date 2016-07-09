@@ -1,0 +1,43 @@
+body {
+	background-color: #ecf0f1;
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+#sweg	 {
+	font-size: 2vw;
+	height: 100%;
+	width:25vw;
+	text-align: center;
+	display: inline-block;
+}
+#sweg p{
+	top:2vh;
+	position: relative;
+}
+table, th, td{
+	padding:5px;
+}
+.user{
+	display: inline;
+}
+.title{
+	display: inline;
+}
+#bar a{
+	color:black;
+}
+#posts{
+	overflow:none;
+	word-break: break-all;
+}
+.posts{
+	border: 2px gray solid;
+	border-radius:5px;
+}
+ul.share-buttons{
+  list-style: none;
+  padding: 0;
+}
+
+

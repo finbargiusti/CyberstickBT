@@ -1,0 +1,30 @@
+<! DOCTYPE html>
+<html>
+	<head>
+		<title>Get CSDSports</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<script type="text/javascript" src="static/bigtext.js"></script>
+	</head>
+	<body>
+		<div style="position:absolute;left:50%;top:50%;transform: translate(-50%, -50%)" class="well"><img style="width:500px" src="static/images/sportsbag.jpg"/></div>
+		<form>
+	<div  id="bigtext"  style="text-align:center;height:180px;width:280px;position:absolute;left:34%;top:45%;background-color:red;">
+			<p style="height:500px;	left:50%;top:50%;" contenteditable>Lorem Ipsum</p>
+		</div>
+		</form>
+		 <script>
+		
+		$(function(){$('#bigtext').bigtext();});	
+// while (true){
+		//	$('#bigtext').bigtext();
+		//}
+		$('#bigtext').keyup(function(){
+				$('#bigtext').bigtext({
+		maxfontsize: 80
+});
+		});
+		
+		</script>
+
+	</body>
+</html>

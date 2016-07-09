@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<br>
+<div id="posts">
+	{% for postlol in post %}
+	<div class="posts">
+	<table >
+	<tr>
+        <td><strong><h3><wbr><p class="title">{{ postlol.title }}</p>&nbsp;&nbsp;&nbsp; <p class="user">{{ postlol.user }}</wbr></p></h3></strong><br/></td>
+    </tr>
+    <tr>	
+    	<td><h4><wbr>{{ postlol.post }}</wbr></h4></td>
+    </tr>
+	</table>
+	</div>
+	<br/><br/>
+	{% endfor %}
+</div>
+
+
+{% endblock %}

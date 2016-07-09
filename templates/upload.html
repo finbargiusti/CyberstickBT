@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content  %}
+<script>
+Dropzone.options.dropzone = {
+  maxFilesize: 2048, // MB
+};
+</script>
+<script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+<link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
+<center>   
+	<h1>Upload new File</h1>
+	<form action="/uploadz/{{ displayPath }}" method="post"  id="dropzone" class="dropzone" style="background-color:#ecf0f1">
+		<div class="fallback">
+			<input name="file" type="file" multiple />
+		</div>
+	</form>
+</center>
+<br/>
+<center>
+	<a class="btn btn-primary btn-lg" href="/download/{{ linker }}">Download link</a><br/><br/>
+	<div class="well" ><h4><b>ID:</b></h4><p>{{ linker }}</p></div>
+</center>
+<br/>
+<a href="https://twitter.com/share" class="twitter-share-button" data-text="Check out my CyberStick http://www.cyberstick.click/download/{{ displayPath }}.">Tweet</a>
+<script>
+	!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+</script>
+<div style="display: inline-block;" class='skype-share' data-href='http://www.cyberstick.click/download/{{ displayPath }}' data-lang='' data-text='Check out my Cyberstick' data-style='small' >
+</div>
+{% endblock %}
