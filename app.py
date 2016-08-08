@@ -1,26 +1,50 @@
 import os
+import urllib.request, urllib.error, urllib.parse
+import string
+import stripe
+import string
 import time
 from random import randint
 import jinja2
-from flask import Flask, render_template, request, jsonify, Markup
+from flask import Flask, render_template, request, jsonify, Markup, redirect, session
 from flask import send_from_directory
 from werkzeug import secure_filename
+import dataset
 
 # create the application object
 
-ADVECTIVE_1 = ['shiny', 'flying', 'explosive', 'fantastic', 'embarrassed', 'flashy', 'stingy', 'dapper', 'implosive',
-               'confusing']
+stripe_keys = {
+    'secret_key': os.environ['SECRET_KEY'],
+    'publishable_key': os.environ['PUBLISHABLE_KEY']
+}
+
+stripe.api_key = stripe_keys['secret_key']
+
+ADVECTIVE_1 = ['shiny', 'flying', 'explosive', 'fantastic', 'embarrassed', 'flashy', 'stingy', 'dapper', 'implosive','confusing']
 COLOUR = ['white', 'red', 'emerald', 'maroon', 'umber', 'ivory', 'jasper', 'chocolate', 'jade', 'silver']
 NOUN = ['bomb', 'direction', 'push', 'medic', 'pie', 'eggnog', 'quartz', 'border', 'cub', 'soldier']
-PIC_EXTENSIONS = ['aac', 'ai', 'aiff', 'avi', 'c', 'cpp', 'css', 'dat', 'dmg', 'doc', 'exe', 'flv', 'gif', 'h', 'hpp',
-                  'html', 'ics', 'jar', 'jpg', 'key', 'mid', 'mp3', 'mpg', 'pdf', 'php', 'png', 'ppt', 'psd', 'py',
-                  'qt', 'rar', 'rb', 'rtf', 'sql', 'tiff', 'txt', 'wav', 'xls', 'xml', 'yml', 'zip']
+PIC_EXTENSIONS = ['aac', 'ai', 'aiff', 'avi', 'c', 'cpp', 'css', 'dat', 'dmg', 'doc', 'exe', 'flv', 'gif', 'h', 'hpp','html', 'ics', 'jar', 'jpg', 'key', 'mid', 'mp3', 'mpg', 'pdf', 'php', 'png', 'ppt', 'psd', 'py','qt', 'rar', 'rb', 'rtf', 'sql', 'tiff', 'txt', 'wav', 'xls', 'xml', 'yml', 'zip']
+
+db = dataset.connect('sqlite:///databse/database.db')
+
+table = db['table']
 
 app = Flask(__name__)
+
+import requests
+
+word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
+
+response = requests.get(word_site)
+WORDS = response.content.splitlines()
+
 
 # config
 app.secret_key = 'you shall not pass'
 
+def randomword():
+    randomNumber = randint(0, len(WORDS)) 
+    return(WORDS[randomNumber])
 
 @app.route('/uploadz/<sid>', methods=['GET', 'POST', 'VIEW'])
 def upload_fileAP(sid):
@@ -39,9 +63,45 @@ def upload_fileAP(sid):
 
 
 def isacceptedpic(extension):
-	if extension in PIC_EXTENSIONS:
-		return True
+    if extension in PIC_EXTENSIONS:
+        return True
 
+@app.route('/buy')
+def buy():
+    return render_template("selectpurchase.html")
+
+@app.route('/buy', methods = ['POST'])
+def buycheck():
+    sessions = request.form['sessions']
+    if int(sessions) <= 99:
+        return render_template("selectpurchase.html", error="Minimum sessions is 100 sessions") 
+    else:
+        return redirect("/checkout/"+sessions)
+
+@app.route('/checkout/<sessions>')
+def checkout(sessions):
+    return render_template("checkout.html", key=stripe_keys['publishable_key'], num=float(sessions), displnum=sessions)
+
+@app.route('/charge/<amount>', methods=['POST'])
+def charge(amount):
+
+    customer = stripe.Customer.create(
+        email='customer@example.com',
+        source=request.form['stripeToken']
+    )
+
+    charge = stripe.Charge.create(
+        customer=customer.id,
+        amount=amount,
+        currency='usd',
+        description='Cyberstick Charge'
+    )
+    string = randomword()+randomword()+randomword()+randomword()+randomword()   
+    table.insert(dict(name='Hai Doe', age=46, country='China'))
+    return render_template('thanks.html', amount=int(amount), string=string)
+
+def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 @app.route('/premium')
 def premium():
@@ -52,12 +112,9 @@ def premium():
 def upload_android():
     path = "/home/finbar/www/static/uploads/"
     now = time.time()
-    randomNumber = randint(0, 9)
-    name = ADVECTIVE_1[int(randomNumber)]
-    randomNumber = randint(0, 9)
-    name += COLOUR[int(randomNumber)]
-    randomNumber = randint(0, 9)
-    name += NOUN[int(randomNumber)]
+    name = randomword() 
+    name += randomword() 
+    name += randomword() 
     seis = name + '-' + str(now)
     upPath = path + seis
     os.mkdir(upPath)
@@ -78,12 +135,9 @@ def johnluke():
 def add_message():
     path = "/home/finbar/www/static/uploads/"
     now = time.time()
-    randomNumber = randint(0, 9)
-    name = ADVECTIVE_1[int(randomNumber)]
-    randomNumber = randint(0, 9)
-    name += COLOUR[int(randomNumber)]
-    randomNumber = randint(0, 9)
-    name += NOUN[int(randomNumber)]
+    name = randomword() 
+    name += randomword()
+    name += randomword()
     seis = name + '-' + str(now)
     upPath = path + seis
     os.mkdir(upPath)
@@ -110,10 +164,10 @@ def downloadApi(did):
     for file in sessionFilesList:
         fileSplit = file.rsplit(".", 1)
         name = fileSplit[0]
-	if len(fileSplit) >= 1:
-		extension = fileSplit[1]
-	else:
-		extension = "None!"
+    if len(fileSplit) >= 1:
+        extension = fileSplit[1]
+    else:
+        extension = "None!"
         files.append({'name': name, 'extension': extension})
     filesession = {'session': sessionFolder}
     return jsonify(zfile=files, xfile=filesession)
@@ -126,26 +180,34 @@ def help():
 
 @app.route('/uplads/<sid>/<filename>')
 def uploaded_file(sid, filename):
-    print "teste"
+    print("teste")
     return send_from_directory("/home/finbar/www/static/uploads/" + sid + "/", filename)
 
 
 @app.route('/upload', methods=['GET', 'POST', 'VIEW'])
 def upload_file():
-    path = "/home/finbar/www/static/uploads/"
-    now = time.time()
-    randomNumber = randint(0, 9)
-    name = ADVECTIVE_1[int(randomNumber)]
-    randomNumber = randint(0, 9)
-    name += COLOUR[int(randomNumber)]
-    randomNumber = randint(0, 9)
-    name += NOUN[int(randomNumber)]
-    seis = name + '-' + str(now)
-    upPath = path + seis
-    os.mkdir(upPath)
-    UPLOAD_FOLDER = upPath
-    return render_template('upload.html', displayPath=seis, linker=name)
+    if 'username' in session:
+        path = "/home/finbar/www/static/uploads/"
+        now = time.time()
+        name = randomword()
+        name += randomword()
+        name += randomword() 
+        seis = name + '-' + str(now)
+        upPath = path + seis
+        os.mkdir(upPath)
+        UPLOAD_FOLDER = upPath
+        return render_template('upload.html', displayPath=seis, linker=name)
+    return redirect("/login")
 
+@app.route('/login')
+def login():
+    if request.method == 'POST':
+        key = request.form['username']
+    keys = db['keys'].all()
+    if key in keys:
+        session['username'] = key 
+        return redirect(url_for('upload'))
+    return render_template("login.html")
 
 @app.route('/konami')
 def konami():
@@ -208,7 +270,7 @@ def maxlisten():
 @app.route('/patrick')
 def patrick():
     return ('got your ip dos time')
-    print jsonify({'ip': request.remote_addr}), 200
+    print(jsonify({'ip': request.remote_addr}), 200)
 
 
 @app.route('/easteregg')
@@ -257,4 +319,4 @@ def csdget():
     return render_template('csdget.html')
 
 
-app.run(host='0.0.0.0', port=80)
+app.run(host='0.0.0.0', port=80, debug=True)
