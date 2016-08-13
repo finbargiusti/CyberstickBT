@@ -20,11 +20,6 @@ stripe_keys = {
 
 stripe.api_key = stripe_keys['secret_key']
 
-ADVECTIVE_1 = ['shiny', 'flying', 'explosive', 'fantastic', 'embarrassed', 'flashy', 'stingy', 'dapper', 'implosive','confusing']
-COLOUR = ['white', 'red', 'emerald', 'maroon', 'umber', 'ivory', 'jasper', 'chocolate', 'jade', 'silver']
-NOUN = ['bomb', 'direction', 'push', 'medic', 'pie', 'eggnog', 'quartz', 'border', 'cub', 'soldier']
-PIC_EXTENSIONS = ['aac', 'ai', 'aiff', 'avi', 'c', 'cpp', 'css', 'dat', 'dmg', 'doc', 'exe', 'flv', 'gif', 'h', 'hpp','html', 'ics', 'jar', 'jpg', 'key', 'mid', 'mp3', 'mpg', 'pdf', 'php', 'png', 'ppt', 'psd', 'py','qt', 'rar', 'rb', 'rtf', 'sql', 'tiff', 'txt', 'wav', 'xls', 'xml', 'yml', 'zip']
-
 db = dataset.connect('sqlite:///databse/database.db')
 
 table = db['table']
