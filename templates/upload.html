@@ -6,6 +6,11 @@ Dropzone.options.dropzone = {
 };
 </script>
 <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+<style>
+.dropzone .dz-preview.dz-image-preview {
+     background: transparent !important;
+}
+</style>
 <link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">
 <center>   
 	<h1>Upload new File</h1>
@@ -27,4 +32,5 @@ Dropzone.options.dropzone = {
 </script>
 <div style="display: inline-block;" class='skype-share' data-href='http://www.cyberstick.click/download/{{ displayPath }}' data-lang='' data-text='Check out my Cyberstick' data-style='small' >
 </div>
+<p id="uses">You have {{ kid }} uses left.</p>
 {% endblock %}

@@ -40,4 +40,21 @@ ul.share-buttons{
   padding: 0;
 }
 
+.navbar {
+	background-color:#2ecc71;
+	border-radius: 0;
+	right: 0px;
+	left: 0px;
+	top:0px;
+}
+a.downloadz {
+	display:inline-block;width:120px;color:#333333;text-decoration:none;
+}
 
+div.downloadz {
+	width:100px;height:200px;
+}
+
+.dz-image img {
+    background-color:green;
+}

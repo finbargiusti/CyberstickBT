@@ -1,17 +1,20 @@
 import os
-import urllib.request, urllib.error, urllib.parse
 import string
+import json
 import stripe
 import string
 import time
 from random import randint
 import jinja2
-from flask import Flask, render_template, request, jsonify, Markup, redirect, session
+from flask import Flask, render_template, request, jsonify, Markup, redirect, session, url_for
 from flask import send_from_directory
 from werkzeug import secure_filename
-import dataset
+import requests
+from tinydb import TinyDB, Query
 
 # create the application object
+
+PIC_EXTENSIONS = ['aac', 'ai', 'aiff', 'avi', 'c', 'cpp', 'css', 'dat', 'dmg', 'doc', 'exe', 'flv', 'gif', 'h', 'hpp','html', 'ics', 'jar', 'jpg', 'key', 'mid', 'mp3', 'mpg', 'pdf', 'php', 'png', 'ppt', 'psd', 'py','qt', 'rar', 'rb', 'rtf', 'sql', 'tiff', 'txt', 'wav', 'xls', 'xml', 'yml', 'zip']
 
 stripe_keys = {
     'secret_key': os.environ['SECRET_KEY'],
@@ -20,13 +23,9 @@ stripe_keys = {
 
 stripe.api_key = stripe_keys['secret_key']
 
-db = dataset.connect('sqlite:///databse/database.db')
-
-table = db['table']
+db = TinyDB('databse/db.json')
 
 app = Flask(__name__)
-
-import requests
 
 word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
 
@@ -39,12 +38,12 @@ app.secret_key = 'you shall not pass'
 
 def randomword():
     randomNumber = randint(0, len(WORDS)) 
-    return(WORDS[randomNumber])
+    return(WORDS[randomNumber][0].upper()+WORDS[randomNumber][-(len(WORDS[randomNumber])-1):])
 
 @app.route('/uploadz/<sid>', methods=['GET', 'POST', 'VIEW'])
 def upload_fileAP(sid):
     text = ''
-    seises = os.listdir("/home/finbar/www/static/uploads")
+    seises = os.listdir("static/uploads")
     for x in range(len(seises)):
         if sid in seises[x]:
             text = seises[x]
@@ -52,7 +51,7 @@ def upload_fileAP(sid):
         file = request.files['file']
         if file:
             filename = secure_filename(file.filename)
-            file_path = "/home/finbar/www/static/uploads/" + text + "/"
+            file_path = "static/uploads/" + text + "/"
             file.save(os.path.join(file_path, filename))
             return send_from_directory(file_path, filename)
 
@@ -91,9 +90,11 @@ def charge(amount):
         currency='usd',
         description='Cyberstick Charge'
     )
-    string = randomword()+randomword()+randomword()+randomword()+randomword()   
-    table.insert(dict(name='Hai Doe', age=46, country='China'))
-    return render_template('thanks.html', amount=int(amount), string=string)
+    while True:
+        string = randomword()+randomword()+randomword()+randomword()+randomword()   
+        if len(db.search(Query().id == string)) == 0:
+            db.insert({'id':string, 'uses':int(amount)})
+            return render_template('thanks.html', amount=int(amount), string=string)
 
 def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
@@ -105,7 +106,7 @@ def premium():
 
 @app.route('/uploadandroid')
 def upload_android():
-    path = "/home/finbar/www/static/uploads/"
+    path = "static/uploads/"
     now = time.time()
     name = randomword() 
     name += randomword() 
@@ -115,10 +116,14 @@ def upload_android():
     os.mkdir(upPath)
     return render_template('uploadsimplistic.html', displayPath=seis)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
 
 @app.route('/downloadfile/<cyberID>/<fileName>')
 def downloadzor(cyberID, fileName):
-    return send_from_directory("/home/finbar/www/static/uploads/" + cyberID, fileName)
+    return send_from_directory("static/uploads/" + cyberID, fileName)
 
 
 @app.route('/johnluke')
@@ -128,7 +133,7 @@ def johnluke():
 
 @app.route('/api/upload', methods=['GET', 'POST'])
 def add_message():
-    path = "/home/finbar/www/static/uploads/"
+    path = "static/uploads/"
     now = time.time()
     name = randomword() 
     name += randomword()
@@ -140,7 +145,7 @@ def add_message():
         file = request.files['file']
         if file:
             filename = secure_filename(file.filename)
-            file_path = "/home/finbar/www/static/uploads/" + seis + "/"
+            file_path = "static/uploads/" + seis + "/"
             file.save(os.path.join(file_path, filename))
             return (name)
 
@@ -176,32 +181,44 @@ def help():
 @app.route('/uplads/<sid>/<filename>')
 def uploaded_file(sid, filename):
     print("teste")
-    return send_from_directory("/home/finbar/www/static/uploads/" + sid + "/", filename)
+    return send_from_directory("static/uploads/" + sid + "/", filename)
 
 
 @app.route('/upload', methods=['GET', 'POST', 'VIEW'])
 def upload_file():
     if 'username' in session:
-        path = "/home/finbar/www/static/uploads/"
-        now = time.time()
-        name = randomword()
-        name += randomword()
-        name += randomword() 
-        seis = name + '-' + str(now)
-        upPath = path + seis
-        os.mkdir(upPath)
-        UPLOAD_FOLDER = upPath
-        return render_template('upload.html', displayPath=seis, linker=name)
+        kid = session['username']
+        available = db.search(Query().id == kid) 
+        print(available)
+        if len(available) != 0:
+            if available[0]['uses'] != 0:
+                path = "static/uploads/"
+                now = time.time()
+                name = randomword()
+                name += randomword()
+                name += randomword() 
+                seis = name + '-' + str(now)
+                upPath = path + seis
+                os.mkdir(upPath)
+                UPLOAD_FOLDER = upPath 
+                db.update({'uses':str(int(available[0]['uses'])-1)}, Query().id == kid) 
+                return render_template('upload.html', displayPath=seis, linker=name, kid=available[0]['uses'])
+            else:
+                return render_template("message.html", message="You are out of uses! Buy more!")
+        else:
+            return render_template("message.html", message="Something went wrong! Please contact us")
     return redirect("/login")
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST', 'VIEW'])
 def login():
     if request.method == 'POST':
         key = request.form['username']
-    keys = db['keys'].all()
-    if key in keys:
-        session['username'] = key 
-        return redirect(url_for('upload'))
+        available = db.search(Query().id == key) 
+        if len(available) != 0:
+            session['username'] = key 
+            return redirect(url_for('upload_file'))
+        else:
+            return render_template("login.html", error=Markup("Could not find any keys with that id &#9785;"))
     return render_template("login.html")
 
 @app.route('/konami')
@@ -314,4 +331,4 @@ def csdget():
     return render_template('csdget.html')
 
 
-app.run(host='0.0.0.0', port=80, debug=True)
+app.run(host='0.0.0.0', port=666, debug=True)
