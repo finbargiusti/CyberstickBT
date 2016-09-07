@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <form action="" method="post">
-            <p><input type=text name=username placeholder="Key">
-            <p><input type=submit value=Login>
+			<div class="input-group">
+				<span class="input-group-addon" id="basic-addon1">&#9919;</span>
+				<input type="text" class="form-control" name=username placeholder="Insert key here" aria-describedby="basic-addon1">
+			</div><br/>
+        <input type=submit value=Login class="btn btn-primary btn-lg">
 </form>
+<br/>
 {% endblock %}
