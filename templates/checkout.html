@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<form action="/charge/{{ displnum }}" method="post">
+    <article>
+      <label>
+        <span>Amount is {{ num/100 }} US Dollars</span>
+      </label>
+    </article>
+
+    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+            data-key="{{ key }}"
+            data-description="{{ num }} Cyberstick sessions"
+            data-amount="{{ num }}"
+            data-locale="auto"></script>
+  </form>
+{% endblock %}

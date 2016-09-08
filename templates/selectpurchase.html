@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Buy sessions</h1>
+<form action="/buy" method="post">
+I want <input type="text" name="sessions" class="inline" value="100"></input> sessions please!<br/>
+<strong>Note:</strong> sessions cost 1c each.<br/>
+<input type="submit" value="Checkout"></input>
+</form>
+{% endblock %}
