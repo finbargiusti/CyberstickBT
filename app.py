@@ -158,7 +158,7 @@ def upload_file():
         kid = session['username']
         available = db.search(Query().id == kid) 
         if len(available) != 0:
-            if available[0]['uses'] != 0:
+            if int(available[0]['uses']) >= 0:
                 path = "static/uploads/"
                 now = time.time()
                 name = randomword()
