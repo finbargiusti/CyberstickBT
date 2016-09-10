@@ -4,7 +4,7 @@ import shutil
 import re
 
 while True:
-	fileName = os.listdir("/home/finbar/www/static/uploads/")
+	fileName = os.listdir("static/uploads/")
 	fileLol = [i.split() for i in fileName]
 	timez = len(fileLol)
 	numbor = 0
@@ -14,7 +14,7 @@ while True:
 		tehFile = str(tehFile).translate(None, "[']")
 		tehFileList = tehFile.split("-")
 		if testAge-float(tehFileList[1]) >= 900:
-			shutil.rmtree("/home/finbar/www/static/uploads/"+tehFile)
+			shutil.rmtree("static/uploads/"+tehFile)
 			print ("Deleted session "+tehFile+"!")
 		numbor += 1
 			
