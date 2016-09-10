@@ -6,14 +6,24 @@ import string
 import time
 from random import randint
 import jinja2
-from flask import Flask, render_template, request, jsonify, Markup, redirect, session, url_for
-from flask import send_from_directory
+from flask import Flask, render_template, request, jsonify, Markup
+from flask import send_from_directory, redirect, session, url_for
 from werkzeug import secure_filename
 import requests
 from tinydb import TinyDB, Query
 
 
-PIC_EXTENSIONS = ['aac', 'ai', 'aiff', 'avi', 'c', 'cpp', 'css', 'dat', 'dmg', 'doc', 'exe', 'flv', 'gif', 'h', 'hpp','html', 'ics', 'jar', 'jpg', 'key', 'mid', 'mp3', 'mpg', 'pdf', 'php', 'png', 'ppt', 'psd', 'py','qt', 'rar', 'rb', 'rtf', 'sql', 'tiff', 'txt', 'wav', 'xls', 'xml', 'yml', 'zip']
+PIC_EXTENSIONS = [
+    'aac', 'ai', 'aiff', 'avi', 'c',
+    'cpp', 'css', 'dat', 'dmg', 'doc',
+    'exe', 'flv', 'gif', 'h', 'hpp',
+    'html', 'ics', 'jar', 'jpg', 'key',
+    'mid', 'mp3', 'mpg', 'pdf', 'php',
+    'png', 'ppt', 'psd', 'py', 'qt',
+    'rar', 'rb', 'rtf', 'sql', 'tiff',
+    'txt', 'wav', 'xls', 'xml', 'yml',
+    'zip'
+]
 
 stripe_keys = {
     'secret_key': os.environ['SECRET_KEY'],
@@ -35,9 +45,11 @@ WORDS = response.content.splitlines()
 # config
 app.secret_key = 'you shall not pass'
 
+
 def randomword():
-    randomNumber = randint(0, len(WORDS)) 
-    return(WORDS[randomNumber][0].upper()+WORDS[randomNumber][-(len(WORDS[randomNumber])-1):])
+    randomNumber = randint(0, len(WORDS))
+    return WORDS[randomNumber].capitalize()
+
 
 @app.route('/uploadz/<sid>', methods=['GET', 'POST', 'VIEW'])
 def upload_fileAP(sid):
@@ -59,21 +71,31 @@ def isacceptedpic(extension):
     if extension in PIC_EXTENSIONS:
         return True
 
+
 @app.route('/buy')
 def buy():
     return render_template("selectpurchase.html", isinsession=session)
 
-@app.route('/buy', methods = ['POST'])
+
+@app.route('/buy', methods=['POST'])
 def buycheck():
     sessions = request.form['sessions']
     if int(sessions) <= 99:
-        return render_template("selectpurchase.html", error="Minimum sessions is 100 sessions", isinsession=session) 
+        return render_template("selectpurchase.html",
+                               error="Minimum sessions is 100 sessions",
+                               isinsession=session)
     else:
-        return redirect("/checkout/"+sessions)
+        return redirect("/checkout/" + sessions)
+
 
 @app.route('/checkout/<sessions>')
 def checkout(sessions):
-    return render_template("checkout.html", key=stripe_keys['publishable_key'], num=float(sessions), displnum=sessions, isinsession=session)
+    return render_template("checkout.html",
+                           key=stripe_keys['publishable_key'],
+                           num=float(sessions),
+                           displnum=sessions,
+                           isinsession=session)
+
 
 @app.route('/charge/<amount>', methods=['POST'])
 def charge(amount):
@@ -89,29 +111,38 @@ def charge(amount):
         currency='usd',
         description='Cyberstick Charge'
     )
+
     while True:
-        string = randomword()+randomword()+randomword()+randomword()+randomword()   
+        string = randomword() + randomword() + randomword() + randomword() + randomword()
         if len(db.search(Query().id == string)) == 0:
-            db.insert({'id':string, 'uses':int(amount)})
-            return render_template('thanks.html', amount=int(amount), string=string, isinsession=session)
+            db.insert({'id': string, 'uses': int(amount)})
+            return render_template('thanks.html',
+                                   amount=int(amount),
+                                   string=string,
+                                   isinsession=session)
+
 
 def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
 
+
 @app.route('/downloadfile/<cyberID>/<fileName>')
 def downloadzor(cyberID, fileName):
-    return send_from_directory("static/uploads/" + cyberID, fileName, isinsession=session)
+    return send_from_directory("static/uploads/" + cyberID,
+                                fileName, isinsession=session)
+
 
 @app.route('/api/upload', methods=['GET', 'POST'])
 def add_message():
     path = "static/uploads/"
     now = time.time()
-    name = randomword() 
+    name = randomword()
     name += randomword()
     name += randomword()
     seis = name + '-' + str(now)
@@ -148,53 +179,68 @@ def downloadApi(did):
     filesession = {'session': sessionFolder}
     return jsonify(zfile=files, xfile=filesession)
 
+
 @app.route('/help')
 def help():
     return render_template("help.html", isinsession=session)
+
 
 @app.route('/upload', methods=['GET', 'POST', 'VIEW'])
 def upload_file():
     if 'username' in session:
         kid = session['username']
-        available = db.search(Query().id == kid) 
+        available = db.search(Query().id == kid)
         if len(available) != 0:
             if int(available[0]['uses']) >= 0:
                 path = "static/uploads/"
                 now = time.time()
                 name = randomword()
                 name += randomword()
-                name += randomword() 
+                name += randomword()
                 seis = name + '-' + str(now)
                 upPath = path + seis
                 os.mkdir(upPath)
-                UPLOAD_FOLDER = upPath 
-                db.update({'uses':str(int(available[0]['uses'])-1)}, Query().id == kid) 
-                return render_template('upload.html', displayPath=seis, linker=name, kid=available[0]['uses'], isinsession=session)
+                UPLOAD_FOLDER = upPath
+                db.update(
+                    {'uses': str(int(available[0]['uses']) - 1)}, Query().id == kid)
+                return render_template('upload.html',
+                                       displayPath=seis,
+                                       linker=name,
+                                       kid=available[0]['uses'],
+                                       isinsession=session)
             else:
-                return render_template("message.html", message="You are out of uses! Buy more!", isinsession=session)
+                return render_template("message.html",
+                                       message="You are out of uses! Buy more!",
+                                       isinsession=session)
         else:
-            return render_template("message.html", message="Something went wrong! Please contact us", isinsession=session)
+            return render_template("message.html",
+                                   message="Something went wrong! Please contact us",
+                                   isinsession=session)
     return redirect("/login")
+
 
 @app.route('/login', methods=['GET', 'POST', 'VIEW'])
 def login():
     if request.method == 'POST':
         key = request.form['username']
-        available = db.search(Query().id == key) 
+        available = db.search(Query().id == key)
         if len(available) != 0:
-            session['username'] = key 
+            session['username'] = key
             return redirect(url_for('upload_file'))
         else:
             return render_template("login.html", error=Markup("Could not find any keys with that id &#9785;"))
     return render_template("login.html", isinsession=session)
 
+
 @app.route('/konami')
 def konami():
     return render_template('konami.html')
 
+
 @app.route('/contact')
 def contact():
     return render_template('contact.html', isinsession=session)
+
 
 @app.route('/download/<did>')
 def download(did):
@@ -213,22 +259,27 @@ def download(did):
 
 
 def istoolong(string):
-    return string[:7]+"..."
+    return string[:7] + "..."
+
 
 def short_caption(someitem):
     return len(someitem) < 11
+
 
 @app.route('/about')
 def about():
     return render_template('about.html', isinsession=session)
 
+
 @app.route('/')
 def home():
     return render_template("index.html", isinsession=session)
 
+
 @app.errorhandler(404)
 def error404(e):
     return render_template("error.html", isinsession=session), 404
+
 
 @app.errorhandler(500)
 def error500(e):
