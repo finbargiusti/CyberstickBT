@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
+{% if username %}
+<form action="/charge/{{ displnum }}/{{ username }}" method="post">
+{% else %}
 <form action="/charge/{{ displnum }}" method="post">
+{% endif %}
     <article>
       <label>
         <span>Amount is {{ num/100 }} US Dollars</span>

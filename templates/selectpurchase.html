@@ -3,22 +3,21 @@
 <div class="buy">
     <h1>Buy sessions</h1>
     <form action="/buy" method="post">
-    I want <input type="text" name="sessions" class="inline" value="100"></input> sessions please!<br/>
-    <strong>Note:</strong> sessions cost 1c each.<br/>
-        <input type="submit" value="Checkout"></input>
-    </form>
-</div>
-<br/><br/><br/>
-<div id="buy">
-    <h1>Add uses to your session</h1>
-    <form action="/buy" method="post">
-        I want <input type="text" name="sessions" class="inline" value="100"></input> sessions please!<br/><br/>
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">Sessions</span>
+            <input type="text" class="form-control" name="sessions" placeholder="Insert required sessions here" aria-describedby="basic-addon1">
+        </div><br/>
         <div class="input-group">
             <span class="input-group-addon" id="basic-addon1">&#9919;</span>
-            <input type="text" class="form-control" name=username placeholder="Insert key here" aria-describedby="basic-addon1">
+            {% if 'username' in session %}
+            <input type="text" class="form-control" name="username" placeholder="Insert key here *leave empty for new key" value="{{ session['username'] }}" aria-describedby="basic-addon1">
+            {% else %}
+            <input type="text" class="form-control" name="username" placeholder="Insert key here *leave empty for new key" aria-describedby="basic-addon1">
+            {% endif %}
         </div><br/>
         <strong>Note:</strong> sessions cost 1c each.<br/>
         <input type="submit" value="Checkout"></input>
     </form>
 </div>
+<br/>
 {% endblock %}

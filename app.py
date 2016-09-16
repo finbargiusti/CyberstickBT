@@ -80,12 +80,16 @@ def buy():
 @app.route('/buy', methods=['POST'])
 def buycheck():
     sessions = request.form['sessions']
-    if int(sessions) <= 99:
+    username = request.form['username']
+    if int(sessions) <= 99 or sessions == "":
         return render_template("selectpurchase.html",
                                error="Minimum sessions is 100 sessions",
                                isinsession=session)
     else:
-        return redirect("/checkout/" + sessions)
+        if username == "":
+            return redirect("/checkout/" + sessions)
+        else:
+            return redirect("/checkout/" + sessions + "/" + username)
 
 
 @app.route('/checkout/<sessions>')
@@ -95,6 +99,16 @@ def checkout(sessions):
                            num=float(sessions),
                            displnum=sessions,
                            isinsession=session)
+
+
+@app.route('/checkout/<sessions>/<username>')
+def checkoutuser(sessions, username):
+    return render_template("checkout.html",
+                           key=stripe_keys['publishable_key'],
+                           num=float(sessions),
+                           displnum=sessions,
+                           isinsession=session,
+                           username=username)
 
 
 @app.route('/charge/<amount>', methods=['POST'])
@@ -120,6 +134,32 @@ def charge(amount):
                                    amount=int(amount),
                                    string=string,
                                    isinsession=session)
+
+
+@app.route('/charge/<amount>/<username>', methods=['POST'])
+def chargeuser(amount, username):
+    if len(db.search(Query().id == username)) == 1:
+        customer = stripe.Customer.create(
+            email=request.form['stripeEmail'],
+            source=request.form['stripeToken']
+        )
+
+        charge = stripe.Charge.create(
+            customer=customer.id,
+            amount=amount,
+            currency='usd',
+            description='Cyberstick Charge'
+        )
+        available = db.search(Query().id == username)
+        db.update({'uses': str(int(available[0]['uses']) + int(amount))}, Query().id == username) 
+        return render_template('thanks.html',
+                                   amount=int(amount),
+                                   string=username,
+                                   isinsession=session)
+    else:
+        return render_template("message.html",
+                               message="Key not found. Please contact us",
+                               isinsession=session)
 
 
 def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
@@ -201,8 +241,7 @@ def upload_file():
                 upPath = path + seis
                 os.mkdir(upPath)
                 UPLOAD_FOLDER = upPath
-                db.update(
-                    {'uses': str(int(available[0]['uses']) - 1)}, Query().id == kid)
+                db.update({'uses': str(int(available[0]['uses']) - 1)}, Query().id == kid)
                 return render_template('upload.html',
                                        displayPath=seis,
                                        linker=name,
