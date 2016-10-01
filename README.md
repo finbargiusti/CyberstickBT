@@ -15,7 +15,7 @@ cyberstick.click/download/[ID]
 
 Now you can send the link/ID to the recipient.
 The link will be automatically deleted in exactly 15 minutes (under consideration).
-The IDs are in the format of three easy to remember capitalised words pulled from an [online dictionary](https://svnweb.freebsd.org/csrg/share/dict/words).
+The IDs are in the format of three easy to remember capitalised words pulled from an [online dictionary](https://svnweb.freebsd.org/csrg/share/dict/words?view=co).
 Because Cyberstick has open source API (Application Programming Interface) that has been published by me (and is free to use and republish), developers can build apps that use Cyberstick in the background serve as a portal to my service.
 There is an online tutorial on the Help page of the website
 Cyberstick offers a secure file-sharing system that cannot be definitively traced to them. Their data cannot. Moreover there is NO FOOTPRINT on the internet of the file ever having existed in the first place. The person who purchases the session is in theory traceable but it can never be proven that they ever shared a file.
