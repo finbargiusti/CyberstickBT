@@ -177,7 +177,7 @@ def logout():
 @app.route('/downloadfile/<cyberID>/<fileName>')
 def downloadzor(cyberID, fileName):
     return send_from_directory("static/uploads/" + cyberID,
-                                fileName, isinsession=session)
+                                fileName)
 
 
 @app.route('/api/upload/username', methods=['GET', 'POST'])
@@ -243,7 +243,7 @@ def upload_file():
                 name = randomword()
                 name += randomword()
                 name += randomword()
-                seis = name + '-' + str(now)
+                seis = secure_filename(name) + '-' + str(now)
                 upPath = path + seis
                 os.mkdir(upPath)
                 UPLOAD_FOLDER = upPath
