@@ -130,6 +130,7 @@ def charge(amount):
         string = randomword() + randomword() + randomword() + randomword() + randomword()
         if len(db.search(Query().id == string)) == 0:
             db.insert({'id': string, 'uses': int(amount)})
+            session['username'] = string
             return render_template('thanks.html',
                                    amount=int(amount),
                                    string=string,
@@ -152,6 +153,7 @@ def chargeuser(amount, username):
         )
         available = db.search(Query().id == username)
         db.update({'uses': str(int(available[0]['uses']) + int(amount))}, Query().id == username) 
+        session['username'] = username
         return render_template('thanks.html',
                                    amount=int(amount),
                                    string=username,
@@ -178,23 +180,27 @@ def downloadzor(cyberID, fileName):
                                 fileName, isinsession=session)
 
 
-@app.route('/api/upload', methods=['GET', 'POST'])
-def add_message():
+@app.route('/api/upload/username', methods=['GET', 'POST'])
+def add_message(username):
     path = "static/uploads/"
-    now = time.time()
-    name = randomword()
-    name += randomword()
-    name += randomword()
-    seis = name + '-' + str(now)
-    upPath = path + seis
-    os.mkdir(upPath)
-    if request.method == 'POST':
-        file = request.files['file']
-        if file:
-            filename = secure_filename(file.filename)
-            file_path = "static/uploads/" + seis + "/"
-            file.save(os.path.join(file_path, filename))
-            return (name)
+    available = db.search(Query().id == kid)
+    if len(available) != 0:
+        now = time.time()
+        name = randomword()
+        name += randomword()
+        name += randomword()
+        seis = name + '-' + str(now)
+        upPath = path + seis
+        os.mkdir(upPath)
+        if request.method == 'POST':
+            file = request.files['file']
+            if file:
+                filename = secure_filename(file.filename)
+                file_path = "static/uploads/" + seis + "/"
+                file.save(os.path.join(file_path, filename))
+                return (name)
+    else:
+        return "error"
 
 
 @app.route('/api/download/<did>')
