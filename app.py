@@ -1,4 +1,5 @@
 import os
+from pdb import set_trace as bp
 import string
 import json
 import stripe
@@ -180,10 +181,10 @@ def downloadzor(cyberID, fileName):
                                 fileName)
 
 
-@app.route('/api/upload/username', methods=['GET', 'POST'])
+@app.route('/api/upload/<username>', methods=['GET', 'POST'])
 def add_message(username):
     path = "static/uploads/"
-    available = db.search(Query().id == kid)
+    available = db.search(Query().id == username)
     if len(available) != 0:
         now = time.time()
         name = randomword()
@@ -214,13 +215,13 @@ def downloadApi(did):
             sessionFolder = session
     sessionFilesList = os.listdir("static/uploads/" + sessionFolder + "/")
     files = []
-    for file in sessionFilesList:
-        fileSplit = file.rsplit(".", 1)
+    for tfile in sessionFilesList:
+        fileSplit = tfile.rsplit(".", 1)
         name = fileSplit[0]
-    if len(fileSplit) >= 1:
-        extension = fileSplit[1]
-    else:
-        extension = "None!"
+        if len(fileSplit) >= 1:
+            extension = fileSplit[1]
+        else:
+            extension = "None!"
         files.append({'name': name, 'extension': extension})
     filesession = {'session': sessionFolder}
     return jsonify(zfile=files, xfile=filesession)
@@ -231,11 +232,36 @@ def help():
     return render_template("help.html", isinsession=session)
 
 
+@app.route('/manage')
+def manage():
+    if 'username' in session:
+        kid = session['username']
+        available = db.search(query().id == kid)
+        if len(available) != 0:
+            sessionTime = []
+            sessionFolder = []
+            sessions = os.listdir("static/uploads")
+            for session in sessions:
+                name, stime = session.split('-')
+                if name == did:
+                    sessionTime.append(stime)
+                    seconds = round(86400 - (time.time() - float(sessionTime)), 0)
+                    m, s = divmod(seconds, 60)
+                    sessionFolder.append(session)
+            return render_template("manage.html", 
+                                   sessions=sessionFolder,
+                                   times=sessionFolder,
+                                   isinsession=session)
+    else:
+       return redirect('/login') 
+    
+
+
 @app.route('/upload', methods=['GET', 'POST', 'VIEW'])
 def upload_file():
     if 'username' in session:
         kid = session['username']
-        available = db.search(Query().id == kid)
+        available = db.search(query().id == kid)
         if len(available) != 0:
             if int(available[0]['uses']) >= 0:
                 path = "static/uploads/"
@@ -243,7 +269,7 @@ def upload_file():
                 name = randomword()
                 name += randomword()
                 name += randomword()
-                seis = secure_filename(name) + '-' + str(now)
+                seis = secure_filename(name) + '-' + str(now) + '-' + session['username']
                 upPath = path + seis
                 os.mkdir(upPath)
                 UPLOAD_FOLDER = upPath
@@ -261,7 +287,21 @@ def upload_file():
             return render_template("message.html",
                                    message="Something went wrong! Please contact us",
                                    isinsession=session)
-    return redirect("/login")
+    else:
+        path = "static/uploads/"
+        now = time.time()
+        name = randomword()
+        name += randomword()
+        name += randomword()
+        seis = secure_filename(name) + '-' + str(now)
+        upPath = path + seis
+        os.mkdir(upPath)
+        UPLOAD_FOLDER = upPath
+        return render_template('upload.html',
+                               displayPath=seis,
+                               linker=name,
+                               isinsession=session)
+    
 
 
 @app.route('/login', methods=['GET', 'POST', 'VIEW'])
@@ -297,7 +337,10 @@ def download(did):
             sessionTime = stime
             sessionFolder = session
     sessionFilesList = os.listdir("static/uploads/" + sessionFolder + "/")
-    seconds = round(900 - (time.time() - float(sessionTime)), 0)
+    if len(session.split('-')) == 2:
+        seconds = round(900 - (time.time() - float(sessionTime)), 0)
+    else:
+        seconds = round(86400 - (time.time() - float(sessionTime)), 0)
     m, s = divmod(seconds, 60)
     timeRemain = "%02d minutes %02d seconds" % (m, s)
     return render_template('download.html', timeRemain=timeRemain, session=sessionFolder, fileList=sessionFilesList, PIC_EXTENSIONS=PIC_EXTENSIONS, isinsession=session)

@@ -13,8 +13,13 @@ while True:
 		tehFile = fileLol[numbor]
 		tehFile = str(tehFile).translate(None, "[']")
 		tehFileList = tehFile.split("-")
-		if testAge-float(tehFileList[1]) >= 900:
-			shutil.rmtree("static/uploads/"+tehFile)
-			print ("Deleted session "+tehFile+"!")
+        if len(tehFileList) == 2:
+            if testAge-float(tehFileList[1]) >= 900:
+                shutil.rmtree("static/uploads/"+tehFile)
+                print ("Deleted session "+tehFile+"!")
+        if len(tehFileList) == 3:
+            if testAge-float(tehFileList[1]) >= 86400:
+                shutil.rmtree("static/uploads/"+tehFile)
+                print ("Deleted session "+tehFile+"!")
 		numbor += 1
 			
