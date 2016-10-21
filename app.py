@@ -14,7 +14,7 @@ from werkzeug import secure_filename
 import requests
 from tinydb import TinyDB, Query
 
-
+# exension thumbnails
 PIC_EXTENSIONS = [
     'aac', 'ai', 'aiff', 'avi', 'c',
     'cpp', 'css', 'dat', 'dmg', 'doc',
@@ -27,6 +27,7 @@ PIC_EXTENSIONS = [
     'zip'
 ]
 
+# stripe key selection
 stripe_keys = {
     'secret_key': os.environ['SECRET_KEY'],
     'publishable_key': os.environ['PUBLISHABLE_KEY']
@@ -34,10 +35,12 @@ stripe_keys = {
 
 stripe.api_key = stripe_keys['secret_key']
 
+# tinyDB database
 db = TinyDB('databse/db.json')
 
 app = Flask(__name__)
 
+# get words
 word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
 
 response = requests.get(word_site)
@@ -47,12 +50,13 @@ WORDS = response.content.splitlines()
 # config
 app.secret_key = 'you shall not pass'
 
-
+# random word generator
 def randomword():
     randomNumber = randint(0, len(WORDS))
     return WORDS[randomNumber].capitalize()
 
 
+# upload confirmer
 @app.route('/uploadz/<sid>', methods=['GET', 'POST', 'VIEW'])
 def upload_fileAP(sid):
     text = ''
@@ -69,16 +73,13 @@ def upload_fileAP(sid):
             return send_from_directory(file_path, filename)
 
 
-def isacceptedpic(extension):
-    if extension in PIC_EXTENSIONS:
-        return True
-
-
+# purchase page
 @app.route('/buy')
 def buy():
     return render_template("selectpurchase.html", isinsession=session)
 
 
+# buy check and send on
 @app.route('/buy', methods=['POST'])
 def buycheck():
     sessions = request.form['sessions']
@@ -94,6 +95,7 @@ def buycheck():
             return redirect("/checkout/" + sessions + "/" + username)
 
 
+# stripe checkout w/o prev username
 @app.route('/checkout/<sessions>')
 def checkout(sessions):
     return render_template("checkout.html",
@@ -103,6 +105,7 @@ def checkout(sessions):
                            isinsession=session)
 
 
+# stripe checkout w/ prev username
 @app.route('/checkout/<sessions>/<username>')
 def checkoutuser(sessions, username):
     return render_template("checkout.html",
@@ -113,6 +116,7 @@ def checkoutuser(sessions, username):
                            username=username)
 
 
+# stripe charge w/o username
 @app.route('/charge/<amount>', methods=['POST'])
 def charge(amount):
 
@@ -139,6 +143,7 @@ def charge(amount):
                                    isinsession=session)
 
 
+# stripe charge w/ username
 @app.route('/charge/<amount>/<username>', methods=['POST'])
 def chargeuser(amount, username):
     if len(db.search(Query().id == username)) == 1:
@@ -166,6 +171,7 @@ def chargeuser(amount, username):
                                isinsession=session)
 
 
+# user id generator
 def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -236,19 +242,17 @@ def help():
 @app.route('/manage')
 def manage():
     if 'username' in session:
-        kid = session['username']
-        available = db.search(query().id == kid)
+        available = db.search(Query().id == session['username'])
         if len(available) != 0:
             sessionTime = []
             sessionFolder = []
             sessions = os.listdir("static/uploads")
-            for session in sessions:
-                name, stime = session.split('-')
-                if name == did:
-                    sessionTime.append(stime)
-                    seconds = round(86400 - (time.time() - float(sessionTime)), 0)
-                    m, s = divmod(seconds, 60)
-                    sessionFolder.append(session)
+            for session1 in sessions:
+                if len(session1.split('-') == 3:
+                    name, stime, user = session1.split('-')
+                    if user = session['username'] 
+                        sessionTime.append(stime)
+                        sessionFolder.append(session)
             return render_template("manage.html", 
                                    sessions=sessionFolder,
                                    times=sessionFolder,
@@ -262,7 +266,7 @@ def manage():
 def upload_file():
     if 'username' in session:
         kid = session['username']
-        available = db.search(query().id == kid)
+        available = db.search(Query().id == kid)
         if len(available) != 0:
             if int(available[0]['uses']) >= 0:
                 path = "static/uploads/"
