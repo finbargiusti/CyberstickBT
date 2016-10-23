@@ -1,11 +1,13 @@
 # Dis is mein file
 import os
+import shutil
 from pdb import set_trace as bp
 import string
 import json
 import stripe
 import string
 import time
+import datetime
 from random import randint
 import jinja2
 from flask import Flask, render_template, request, jsonify, Markup
@@ -176,18 +178,21 @@ def id_generator(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
+# logout
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
 
 
+# download file route
 @app.route('/downloadfile/<cyberID>/<fileName>')
 def downloadzor(cyberID, fileName):
     return send_from_directory("static/uploads/" + cyberID,
                                 fileName)
 
 
+# api upload
 @app.route('/api/upload/<username>', methods=['GET', 'POST'])
 def add_message(username):
     path = "static/uploads/"
@@ -211,6 +216,7 @@ def add_message(username):
         return "error"
 
 
+# api download
 @app.route('/api/download/<did>')
 def downloadApi(did):
     sessionFolder = ""
@@ -234,11 +240,13 @@ def downloadApi(did):
     return jsonify(zfile=files, xfile=filesession)
 
 
+# help page
 @app.route('/help')
 def help():
     return render_template("help.html", isinsession=session)
 
 
+# manage page
 @app.route('/manage')
 def manage():
     if 'username' in session:
@@ -248,20 +256,24 @@ def manage():
             sessionFolder = []
             sessions = os.listdir("static/uploads")
             for session1 in sessions:
-                if len(session1.split('-') == 3:
+                if len(session1.split('-')) == 3:
                     name, stime, user = session1.split('-')
-                    if user = session['username'] 
-                        sessionTime.append(stime)
-                        sessionFolder.append(session)
+                    if user == session['username']:
+                        seconds = round(86400 - (time.time() - float(stime)), 0)
+                        m, s = divmod(float(seconds), 60)
+                        h, m = divmod(m, 60)
+                        sessionTime.append("%02d hours, %02d minutes and %02d seconds" % (h, m, s))
+                        sessionFolder.append(name)
             return render_template("manage.html", 
                                    sessions=sessionFolder,
-                                   times=sessionFolder,
+                                   times=sessionTime,
                                    isinsession=session)
     else:
        return redirect('/login') 
     
 
 
+# upload page
 @app.route('/upload', methods=['GET', 'POST', 'VIEW'])
 def upload_file():
     if 'username' in session:
@@ -290,7 +302,7 @@ def upload_file():
                                        isinsession=session)
         else:
             return render_template("message.html",
-                                   message="Something went wrong! Please contact us",
+        floatmessage="Something went wrong! Please contact us",
                                    isinsession=session)
     else:
         path = "static/uploads/"
@@ -309,6 +321,7 @@ def upload_file():
     
 
 
+# login page
 @app.route('/login', methods=['GET', 'POST', 'VIEW'])
 def login():
     if request.method == 'POST':
@@ -322,16 +335,19 @@ def login():
     return render_template("login.html", isinsession=session)
 
 
+# konami easteregg image
 @app.route('/konami')
 def konami():
     return render_template('konami.html')
 
 
+# contact page
 @app.route('/contact')
 def contact():
     return render_template('contact.html', isinsession=session)
 
 
+# download page
 @app.route('/download/<did>')
 def download(did):
     sessionFolder = ""
@@ -348,32 +364,56 @@ def download(did):
         seconds = round(86400 - (time.time() - float(sessionTime)), 0)
     m, s = divmod(seconds, 60)
     timeRemain = "%02d minutes %02d seconds" % (m, s)
-    return render_template('download.html', timeRemain=timeRemain, session=sessionFolder, fileList=sessionFilesList, PIC_EXTENSIONS=PIC_EXTENSIONS, isinsession=session)
+    return render_template('download.html',
+                           timeRemain=timeRemain,
+                           session=sessionFolder,
+                           fileList=sessionFilesList,
+                           PIC_EXTENSIONS=PIC_EXTENSIONS,
+                           isinsession=session)
 
 
-def istoolong(string):
-    return string[:7] + "..."
+# delete session from manage
+@app.route('/delete/<did>')
+def deletesession(did):
+    if 'username' in session:
+        sessionFolder = ""
+        sessions = os.listdir("static/uploads")
+        for session1 in sessions:
+            name = session1.split('-')[0]
+            if len(session1.split('-')) == 3:
+                if name == did:
+                    if session1.split('-')[2] == session['username']:
+                        sessionFolder = session1 
+        kid = session['username']
+        available = db.search(Query().id == kid)
+        if len(available) != 0:
+            if sessionFolder is not None:
+                if sessionFolder.split('-')[2] == session['username']:
+                    shutil.rmtree('static/uploads/'+sessionFolder)
+                    return redirect("/manage")
+            else:
+                return redirect("/manage")
 
 
-def short_caption(someitem):
-    return len(someitem) < 11
-
-
+# about page
 @app.route('/about')
 def about():
     return render_template('about.html', isinsession=session)
 
 
+# home
 @app.route('/')
 def home():
     return render_template("index.html", isinsession=session)
 
 
+# 404 page
 @app.errorhandler(404)
 def error404(e):
     return render_template("error.html", isinsession=session), 404
 
 
+# 500 page
 @app.errorhandler(500)
 def error500(e):
     return render_template("error.html", isinsession=session), 500
