@@ -111,7 +111,7 @@
         dropzone.on("dragEnter", function() { });
      */
 
-    Dropzone.prototype.events = ["drop", "dragstart", "dragend", "dragenter", "dragover", "dragleave", "addedfile", "addedfiles", "removedfile", "thumbnail", "processing", "processingmultiple", "uploadprogress", "totaluploadprogress", "sending", "sendingmultiple", "success", "successmultiple", "canceled", "canceledmultiple", "complete", "completemultiple", "reset", "maxfilesexceeded", "maxfilesreached", "queuecomplete"];
+    Dropzone.prototype.events = ["drop", "dragstart", "dragend", "dragenter", "dragover", "dragleave", "addedfile", "addedfiles", "removedfile", "thumbnail", "error", "errormultiple", "processing", "processingmultiple", "uploadprogress", "totaluploadprogress", "sending", "sendingmultiple", "success", "successmultiple", "canceled", "canceledmultiple", "complete", "completemultiple", "reset", "maxfilesexceeded", "maxfilesreached", "queuecomplete"];
 
     Dropzone.prototype.defaultOptions = {
       url: null,
@@ -119,7 +119,7 @@
       withCredentials: false,
       parallelUploads: 2,
       uploadMultiple: false,
-      maxFilesize: 20480,
+      maxFilesize: 5000,
       paramName: "file",
       createImageThumbnails: true,
       maxThumbnailFilesize: 10,
@@ -138,7 +138,8 @@
       previewsContainer: null,
       hiddenInputContainer: "body",
       capture: null,
-      dictDefaultMessage: "Drop files here or click here to upload",
+      renameFilename: null,
+      dictDefaultMessage: "Drop files here to upload",
       dictFallbackMessage: "Your browser does not support drag'n'drop file uploads.",
       dictFallbackText: "Please use the fallback form below to upload your files like in the olden days.",
       dictFileTooBig: "File is too big ({{filesize}}MiB). Max filesize: {{maxFilesize}}MiB.",
@@ -259,7 +260,7 @@
           _ref = file.previewElement.querySelectorAll("[data-dz-name]");
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             node = _ref[_i];
-            node.textContent = file.name;
+            node.textContent = this._renameFilename(file.name);
           }
           _ref1 = file.previewElement.querySelectorAll("[data-dz-size]");
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -322,6 +323,31 @@
               return file.previewElement.classList.add("dz-image-preview");
             };
           })(this)), 1);
+        }
+      },
+      error: function(file, message) {
+        var node, _i, _len, _ref, _results;
+        if (file.previewElement) {
+          file.previewElement.classList.add("dz-error");
+          if (typeof message !== "String" && message.error) {
+            message = message.error;
+          }
+          _ref = file.previewElement.querySelectorAll("[data-dz-errormessage]");
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            node = _ref[_i];
+            _results.push(node.textContent = message);
+          }
+          return _results;
+        }
+      },
+      errormultiple: noop,
+      processing: function(file) {
+        if (file.previewElement) {
+          file.previewElement.classList.add("dz-processing");
+          if (file._removeLink) {
+            return file._removeLink.textContent = this.options.dictCancelUpload;
+          }
         }
       },
       processingmultiple: noop,
@@ -695,6 +721,13 @@
       }
     };
 
+    Dropzone.prototype._renameFilename = function(name) {
+      if (typeof this.options.renameFilename !== "function") {
+        return name;
+      }
+      return this.options.renameFilename(name);
+    };
+
     Dropzone.prototype.getFallbackForm = function() {
       var existingFallback, fields, fieldsString, form;
       if (existingFallback = this.getExistingFallback()) {
@@ -896,33 +929,41 @@
     };
 
     Dropzone.prototype._addFilesFromDirectory = function(directory, path) {
-      var dirReader, entriesReader;
+      var dirReader, errorHandler, readEntries;
       dirReader = directory.createReader();
-      entriesReader = (function(_this) {
-        return function(entries) {
-          var entry, _i, _len;
-          for (_i = 0, _len = entries.length; _i < _len; _i++) {
-            entry = entries[_i];
-            if (entry.isFile) {
-              entry.file(function(file) {
-                if (_this.options.ignoreHiddenFiles && file.name.substring(0, 1) === '.') {
-                  return;
+      errorHandler = function(error) {
+        return typeof console !== "undefined" && console !== null ? typeof console.log === "function" ? console.log(error) : void 0 : void 0;
+      };
+      readEntries = (function(_this) {
+        return function() {
+          return dirReader.readEntries(function(entries) {
+            var entry, _i, _len;
+            if (entries.length > 0) {
+              for (_i = 0, _len = entries.length; _i < _len; _i++) {
+                entry = entries[_i];
+                if (entry.isFile) {
+                  entry.file(function(file) {
+                    if (_this.options.ignoreHiddenFiles && file.name.substring(0, 1) === '.') {
+                      return;
+                    }
+                    file.fullPath = "" + path + "/" + file.name;
+                    return _this.addFile(file);
+                  });
+                } else if (entry.isDirectory) {
+                  _this._addFilesFromDirectory(entry, "" + path + "/" + entry.name);
                 }
-                file.fullPath = "" + path + "/" + file.name;
-                return _this.addFile(file);
-              });
-            } else if (entry.isDirectory) {
-              _this._addFilesFromDirectory(entry, "" + path + "/" + entry.name);
+              }
+              readEntries();
             }
-          }
+            return null;
+          }, errorHandler);
         };
       })(this);
-      return dirReader.readEntries(entriesReader, function(success) {
-      });
+      return readEntries();
     };
 
     Dropzone.prototype.accept = function(file, done) {
-      if (file.size > 20000 * 1024 * 1024) {
+      if (file.size > this.options.maxFilesize * 1024 * 1024) {
         return done(this.options.dictFileTooBig.replace("{{filesize}}", Math.round(file.size / 1024 / 10.24) / 100).replace("{{maxFilesize}}", this.options.maxFilesize));
       } else if (!Dropzone.isValidFile(file, this.options.acceptedFiles)) {
         return done(this.options.dictInvalidFileType);
@@ -945,7 +986,11 @@
       this.emit("addedfile", file);
       this._enqueueThumbnail(file);
       return this.accept(file, (function(_this) {
-        return function(success) {
+        return function(error) {
+          if (error) {
+            file.accepted = false;
+            _this._errorProcessing([file], error);
+          } else {
             file.accepted = true;
             if (_this.options.autoQueue) {
               _this.enqueueFile(file);
@@ -1332,7 +1377,7 @@
         }
       }
       for (i = _m = 0, _ref5 = files.length - 1; 0 <= _ref5 ? _m <= _ref5 : _m >= _ref5; i = 0 <= _ref5 ? ++_m : --_m) {
-        formData.append(this._getParamName(i), files[i], files[i].name);
+        formData.append(this._getParamName(i), files[i], this._renameFilename(files[i].name));
       }
       return this.submitRequest(xhr, formData, files);
     };
@@ -1379,7 +1424,7 @@
 
   })(Emitter);
 
-  Dropzone.version = "4.2.0";
+  Dropzone.version = "4.3.0";
 
   Dropzone.options = {};
 

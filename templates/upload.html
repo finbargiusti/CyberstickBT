@@ -1,11 +1,18 @@
 {% extends "base.html" %}
 {% block content  %}
-<script>
-Dropzone.options.dropzone = {
-  maxFilesize: 2048, // MB
+<!-- <script>
+Dropzone.options.myAwesomeDropzone = {
+  paramName: "file", // The name that will be used to transfer the file
+  maxFilesize: 2, // MB
+  accept: function(file, done) {
+    if (file.name == "justinbieber.jpg") {
+      done("Naha, you don't.");
+    }
+    else { done(); }
+  }
 };
-</script>
-<script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+</script> -->
+<script src="https://raw.githubusercontent.com/enyo/dropzone/master/dist/dropzone.js"></script>
 <style>
 .dropzone .dz-preview.dz-image-preview {
      background: transparent !important;

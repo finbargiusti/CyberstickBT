@@ -350,20 +350,24 @@ def contact():
 # download page
 @app.route('/download/<did>')
 def download(did):
-    sessionFolder = ""
     sessions = os.listdir("static/uploads")
     for session in sessions:
-        name, stime = session.split('-')
+        name, stime = session.split('-')[0], session.split('-')[1]
+        if len(session.split('-')) == 3:
+            sessionUser = session.split('-')[2]
         if name == did:
             sessionTime = stime
             sessionFolder = session
     sessionFilesList = os.listdir("static/uploads/" + sessionFolder + "/")
-    if len(session.split('-')) == 2:
-        seconds = round(900 - (time.time() - float(sessionTime)), 0)
-    else:
+    if sessionUser:
         seconds = round(86400 - (time.time() - float(sessionTime)), 0)
-    m, s = divmod(seconds, 60)
-    timeRemain = "%02d minutes %02d seconds" % (m, s)
+        m, s = divmod(seconds, 60)
+        h, m = divmod(m, 60)
+        timeRemain = "%02d hours, %02d minutes, %02d seconds" % (h, m, s)
+    else:
+        seconds = round(900 - (time.time() - float(sessionTime)), 0)
+        m, s = divmod(seconds, 60)
+        timeRemain = "%02d minutes %02d seconds" % (m, s)
     return render_template('download.html',
                            timeRemain=timeRemain,
                            session=sessionFolder,
