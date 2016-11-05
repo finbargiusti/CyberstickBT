@@ -84,7 +84,7 @@
 					<li><a href="/about">About</a></li>
 					<li><a href="/contact">Contact</a></li>
                     {% if 'username' in session %}
-					<li><a href="/logout">Remove your key</a></li>
+					<li><a href="/logout">Logout <b>{{ session['username'] }}</b></a></li>
                     {% else %}
 					<li><a href="/login">Add your key</a></li>
                     {% endif %}

@@ -9,4 +9,7 @@
     {{ sessions[n] }}&emsp;&emsp;&emsp;&emsp;&emsp;Time left: {{ times[n] }}
     </li>
 {% endfor %}
+{% if sessions|length == 0 %}
+    <h2>&nbsp;&nbsp;Looks like nothing's there!</h2> 
+{% endif %}
 {% endblock %}
