@@ -321,6 +321,31 @@ def upload_file():
     
 
 
+@app.route('/upload/<seiser>', methods=['GET', 'POST', 'VIEW'])
+def edit_session(seiser):
+    if 'username' in session:
+        kid = session['username']
+        available = db.search(Query().id == kid)
+        if len(available) != 0:
+            sessions = os.listdir("static/uploads")
+            for session1 in sessions:
+                if len(session1.split('-')) == 3:
+                    name, stime, user = session1.split('-')
+                    if user == session['username']:
+                        sessionFilesList = os.listdir("static/uploads/" + session1 + "/")
+                        return render_template('upload.html',
+                                               files=sessionFilesList,
+                                               displayPath=session1,
+                                               linker=name,
+                                               kid=available[0]['uses'],
+                                               isinsession=session)
+        else:
+            return render_template("message.html",
+        floatmessage="Something went wrong! Please contact us",
+                                   isinsession=session)
+    else:
+        return redirect('/login')
+
 # login page
 @app.route('/login', methods=['GET', 'POST', 'VIEW'])
 def login():
@@ -422,4 +447,4 @@ def error404(e):
 def error500(e):
     return render_template("error.html", isinsession=session), 500
 
-app.run(host='0.0.0.0', port=666, debug=True)
+app.run(host='0.0.0.0', port=80, debug=True)

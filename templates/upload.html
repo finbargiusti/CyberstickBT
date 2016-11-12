@@ -1,17 +1,5 @@
 {% extends "base.html" %}
 {% block content  %}
-<!-- <script>
-Dropzone.options.myAwesomeDropzone = {
-  paramName: "file", // The name that will be used to transfer the file
-  maxFilesize: 2, // MB
-  accept: function(file, done) {
-    if (file.name == "justinbieber.jpg") {
-      done("Naha, you don't.");
-    }
-    else { done(); }
-  }
-};
-</script> -->
 <script src="https://raw.githubusercontent.com/enyo/dropzone/master/dist/dropzone.js"></script>
 <style>
 .dropzone .dz-preview.dz-image-preview {
@@ -39,5 +27,7 @@ Dropzone.options.myAwesomeDropzone = {
 </script>
 <div style="display: inline-block;" class='skype-share' data-href='http://www.cyberstick.click/download/{{ displayPath }}' data-lang='' data-text='Check out my Cyberstick' data-style='small' >
 </div>
+{% if 'username' in session %}
 <p id="uses">You have {{ kid }} uses left.</p>
+{% endif %}
 {% endblock %}
