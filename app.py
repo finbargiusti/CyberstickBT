@@ -367,9 +367,10 @@ def konami():
 
 
 # contact page
-@app.route('/contact')
+@app.route('/news')
 def contact():
-    return render_template('contact.html', isinsession=session)
+	os.system("curl https://cyberstick.tumblr.com/js#_=_ > static/tumblr.js")
+	return render_template('news.html', isinsession=session)
 
 
 # download page

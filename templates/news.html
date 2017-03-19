@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<script type="text/javascript" language="javascript" src="static/tumblr.js?version={{ range(1,500) | random }}"></script>
+<style>
+.tumblr_title
+
+{
+
+            font-family: Arial, SimHei;
+
+            font-size: 2em;
+
+
+}
+
+.tumblr_body
+
+{
+
+            font-family: Arial, SimHei;
+
+            font-size:1em;
+
+            line-height:1.5em;
+
+}
+
+.tumblr_caption
+
+{
+
+            font-family: Arial, SimHei;
+			text-align:center;
+
+            font-size: 2em;
+			padding:5px;
+
+}
+
+.tumblr_posts
+
+{
+
+	list-style-type:none;
+	padding:0;
+
+}
+
+.tumblr_posts *{
+	padding:5px;
+}
+
+.tumblr_post {
+	background-color:white;	
+	border-radius:10px;
+	margin: 0 0 5px 0 ;
+}
+.tumblr_video iframe{
+	max-width:90%;
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
+	padding:10px;
+	border-radius:5px;	
+}
+</style>
+{% endblock %}
+
